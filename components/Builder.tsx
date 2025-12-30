@@ -564,18 +564,14 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
                  {import.meta.env.DEV && (
                    <button
                      onClick={() => {
-                       const url = profile?.liveUrl?.trim();
-                       if (!url) {
-                         alert('Set your Live URL in the sidebar (Profile Identity).');
-                         return;
-                       }
-                       window.open(url, '_blank', 'noopener,noreferrer');
+                      const previewPath = `${import.meta.env.BASE_URL}preview`;
+                      window.open(previewPath, '_blank', 'noopener,noreferrer');
                      }}
                      className="bg-white px-5 py-2.5 rounded-xl shadow-sm border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
-                     title="Open your deployed page"
+                     title="Open preview page"
                    >
                      <Globe size={18} />
-                     <span className="hidden sm:inline">View Online</span>
+                     <span className="hidden sm:inline">Preview</span>
                    </button>
                  )}
 

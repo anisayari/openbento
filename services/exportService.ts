@@ -938,6 +938,26 @@ const generateHtml = (data: SiteData, imageMap: Record<string, string>): string 
 </html>`;
 };
 
+export const generatePreviewSrcDoc = (data: SiteData, opts?: { siteId?: string }) => {
+  const css = generateCSS(data.profile.name);
+
+  const analyticsSupabaseUrl = data.profile.analytics?.supabaseUrl?.trim().replace(/\/+$/, '') || '';
+  const analyticsEnabled = !!(data.profile.analytics?.enabled && analyticsSupabaseUrl && opts?.siteId);
+  const analytics = analyticsEnabled
+    ? {
+        enabled: true,
+        endpoint: `${analyticsSupabaseUrl}/functions/v1/openbento-analytics-track`,
+        siteId: opts!.siteId!,
+      }
+    : undefined;
+
+  const js = generateJS({ analytics });
+
+  return generateHtml(data, {})
+    .replace('<link rel="stylesheet" href="styles.css">', `<style>${css}</style>`)
+    .replace('<script src="app.js" defer></script>', `<script>${js}</script>`);
+};
+
 export type ExportDeploymentTarget =
   | 'vercel'
   | 'netlify'

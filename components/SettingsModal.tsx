@@ -154,19 +154,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                         placeholder="A short bio…"
                       />
                     </div>
-
-                    {import.meta.env.DEV && (
-                      <div>
-                        <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Live URL (Dev)</label>
-                        <input
-                          value={profile.liveUrl || ''}
-                          onChange={(e) => setProfile({ ...profile, liveUrl: e.target.value })}
-                          className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 focus:ring-2 focus:ring-black/5 focus:border-black focus:outline-none transition-all font-medium text-gray-700"
-                          placeholder="https://your-domain.com"
-                        />
-                        <p className="text-[11px] text-gray-400 mt-2">Used by the “View Online” button in dev.</p>
-                      </div>
-                    )}
                   </div>
                 </div>
               </section>

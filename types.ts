@@ -69,7 +69,6 @@ export interface UserProfile {
   theme: 'light' | 'dark';
   primaryColor: string;
   showBranding?: boolean;
-  liveUrl?: string;
   analytics?: {
     enabled?: boolean;
     supabaseUrl?: string; // https://<project-ref>.supabase.co

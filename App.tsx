@@ -1,11 +1,24 @@
 import React, { useState, Suspense } from 'react';
 import Builder from './components/Builder';
+import PreviewPage from './components/PreviewPage';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const ENABLE_LANDING = import.meta.env.VITE_ENABLE_LANDING === 'true';
 const LazyLandingPage = ENABLE_LANDING ? React.lazy(() => import('./components/LandingPage')) : null;
 
 function App() {
+  const route = (() => {
+    if (typeof window === 'undefined') return '/';
+    const base = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
+    const pathname = window.location.pathname;
+    const withoutBase = base && pathname.startsWith(base) ? pathname.slice(base.length) : pathname;
+    return (withoutBase || '/').replace(/\/$/, '') || '/';
+  })();
+
+  if (route === '/preview') {
+    return <PreviewPage />;
+  }
+
   const [page, setPage] = useState<'landing' | 'builder'>(ENABLE_LANDING ? 'landing' : 'builder');
 
   if (!ENABLE_LANDING) {
