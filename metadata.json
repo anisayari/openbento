@@ -1,0 +1,5 @@
+{
+  "name": "OpenBento",
+  "description": "An open-source personal page builder. Create your Bento-style profile, preview it, and export a deployment-ready package for GitHub Pages with a single click.",
+  "requestFramePermissions": []
+}
