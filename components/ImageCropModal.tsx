@@ -378,6 +378,8 @@ const ImageCropModal: React.FC<ImageCropModalProps> = ({ isOpen, src, title, onC
                       style={{
                         width: `${displayed.w}px`,
                         height: `${displayed.h}px`,
+                        maxWidth: 'none',
+                        maxHeight: 'none',
                         transform: `translate(-50%, -50%) translate(${offset.x}px, ${offset.y}px)`,
                         transformOrigin: 'center',
                       }}
