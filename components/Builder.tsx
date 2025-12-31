@@ -1387,22 +1387,22 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
                                               </div>
                                             )}
                                         </div>
-                                        <div className="p-3 grid grid-cols-3 gap-2" style={{ gridAutoRows: '80px' }}>
+                                        <div className="p-3 grid grid-cols-9 gap-1" style={{ gridAutoRows: '28px' }}>
                                             {sortedMobileBlocks.map(block => {
-                                                // Scale down colSpan/rowSpan for mobile (9-col → 3-col)
-                                                const mobileColSpan = Math.max(1, Math.min(3, Math.ceil(block.colSpan / 3)));
-                                                const mobileRowSpan = Math.max(1, Math.min(3, block.rowSpan));
+                                                // Use exact grid positions scaled for mobile view
+                                                const col = block.gridColumn ?? 1;
+                                                const row = block.gridRow ?? 1;
                                                 return (
                                                   <div
                                                     key={block.id}
                                                     className="pointer-events-none"
                                                     style={{
-                                                      gridColumn: `span ${mobileColSpan}`,
-                                                      gridRow: `span ${mobileRowSpan}`,
+                                                      gridColumn: `${col} / span ${block.colSpan}`,
+                                                      gridRow: `${row} / span ${block.rowSpan}`,
                                                     }}
                                                   >
                                                     <Block
-                                                        block={{...block, colSpan: mobileColSpan, rowSpan: mobileRowSpan}}
+                                                        block={block}
                                                         isSelected={false}
                                                         onEdit={() => {}}
                                                         onDelete={() => {}}
