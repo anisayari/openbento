@@ -239,10 +239,10 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
       {/* Header */}
 		      <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-20">
 		        <div>
-		          <h2 className="font-bold text-base text-gray-900 tracking-tight">
+		          <h2 className="font-bold text-sm text-gray-900 tracking-tight">
 		            {editingBlock ? 'Edit Block' : 'Edit'}
 		          </h2>
-		          <p className="text-xs text-gray-400 mt-0.5">{editingBlock ? 'Customize your block' : 'Build your layout'}</p>
+		          <p className="text-[10px] text-gray-400 mt-0.5">{editingBlock ? 'Customize your block' : 'Build your layout'}</p>
 		        </div>
 		        <button onClick={closeEdit} className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-400 hover:text-gray-600"><X size={18} /></button>
 		      </div>
@@ -259,10 +259,10 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
                 {/* 1. Title (Not for spacers or social icons) */}
                 {editingBlock.type !== BlockType.SPACER && editingBlock.type !== BlockType.SOCIAL_ICON && (
                   <div>
-                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Title</label>
-                      <input 
-                          type="text" 
-                          className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3.5 focus:ring-2 focus:ring-black/5 focus:border-black focus:outline-none transition-all font-medium"
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Title</label>
+                      <input
+                          type="text"
+                          className="w-full bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-black/5 focus:border-black focus:outline-none transition-all font-medium"
                           value={editingBlock.title || ''}
                           onChange={(e) => updateBlock({...editingBlock, title: e.target.value})}
                           placeholder="Label your block"
@@ -650,7 +650,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
 	            <section className="space-y-3">
 	              <div className="flex items-center gap-2">
 	                <div className="w-1 h-5 bg-gray-900 rounded-full"></div>
-	                <h3 className="text-base font-bold text-gray-900">Design</h3>
+	                <h3 className="text-sm font-bold text-gray-900">Design</h3>
 	              </div>
 	              <div className="p-4 bg-gray-50 border border-gray-200 rounded-2xl">
 	                <p className="text-sm text-gray-600 leading-relaxed">
@@ -663,7 +663,7 @@ const EditorSidebar: React.FC<EditorSidebarProps> = ({
 	            <section className="space-y-5">
 	              <div className="flex items-center gap-2">
 	                <div className="w-1 h-5 bg-gray-900 rounded-full"></div>
-	                <h3 className="text-base font-bold text-gray-900">Add Content</h3>
+	                <h3 className="text-sm font-bold text-gray-900">Add Content</h3>
 	              </div>
 
 	              <div className="grid grid-cols-3 gap-3">

@@ -294,43 +294,43 @@ const Block: React.FC<BlockProps> = ({
     if (minDim <= 3 || area <= 12) return 'md';
     return 'lg';
   })();
-  // Responsive text sizes: mobile first (smaller), then md: and lg: breakpoints
+  // Responsive text sizes: smaller across the board
   const textScale = {
     titleText: {
-      xs: 'text-[10px] md:text-sm',
-      sm: 'text-xs md:text-base',
-      md: 'text-sm md:text-lg lg:text-xl',
-      lg: 'text-base md:text-xl lg:text-2xl',
-    },
-    titleDefault: {
       xs: 'text-[9px] md:text-xs',
       sm: 'text-[10px] md:text-sm',
       md: 'text-xs md:text-base',
       lg: 'text-sm md:text-lg',
     },
-    subtext: {
-      xs: 'text-[7px] md:text-[9px]',
-      sm: 'text-[8px] md:text-[10px]',
-      md: 'text-[9px] md:text-xs',
-      lg: 'text-[10px] md:text-sm',
-    },
-    body: {
+    titleDefault: {
       xs: 'text-[8px] md:text-[10px]',
       sm: 'text-[9px] md:text-xs',
       md: 'text-[10px] md:text-sm',
       lg: 'text-xs md:text-base',
     },
-    overlayTitle: {
-      xs: 'text-[8px] md:text-[10px]',
-      sm: 'text-[9px] md:text-xs',
-      md: 'text-[10px] md:text-sm lg:text-base',
-      lg: 'text-xs md:text-base lg:text-lg',
-    },
-    overlaySubtext: {
+    subtext: {
       xs: 'text-[6px] md:text-[8px]',
       sm: 'text-[7px] md:text-[9px]',
       md: 'text-[8px] md:text-[10px]',
       lg: 'text-[9px] md:text-xs',
+    },
+    body: {
+      xs: 'text-[7px] md:text-[9px]',
+      sm: 'text-[8px] md:text-[10px]',
+      md: 'text-[9px] md:text-xs',
+      lg: 'text-[10px] md:text-sm',
+    },
+    overlayTitle: {
+      xs: 'text-[7px] md:text-[9px]',
+      sm: 'text-[8px] md:text-[10px]',
+      md: 'text-[9px] md:text-xs',
+      lg: 'text-[10px] md:text-sm',
+    },
+    overlaySubtext: {
+      xs: 'text-[5px] md:text-[7px]',
+      sm: 'text-[6px] md:text-[8px]',
+      md: 'text-[7px] md:text-[9px]',
+      lg: 'text-[8px] md:text-[10px]',
     },
   };
   const textSizes = {
@@ -625,26 +625,17 @@ const Block: React.FC<BlockProps> = ({
           </button>
         )}
 
-        {/* YouTube Grid Layout - Two column design like reference image */}
-        <div className="w-full h-full p-3 md:p-4 lg:p-5 flex gap-3 md:gap-4 lg:gap-6">
+        {/* YouTube Grid Layout - Vertical: header row, channel name, video grid */}
+        <div className="w-full h-full p-2.5 md:p-3 flex flex-col">
 
-          {/* Left Column: YouTube icon, name, subscribe button - stacked vertically */}
-          <div className="w-[35%] md:w-[30%] flex flex-col items-start justify-center shrink-0">
-            {/* YouTube Icon */}
-            <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-xl md:rounded-2xl bg-red-500 flex items-center justify-center shadow-lg mb-2 md:mb-3">
-              <svg
-                viewBox="0 0 24 24"
-                fill="white"
-                className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8"
-              >
+          {/* Top Row: YouTube icon (left) + Subscribe button (right) */}
+          <div className="flex items-center justify-between mb-1.5 md:mb-2">
+            {/* YouTube Icon - small */}
+            <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-red-500 flex items-center justify-center shadow">
+              <svg viewBox="0 0 24 24" fill="white" className="w-4 h-4 md:w-5 md:h-5">
                 <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0C.488 3.45.029 5.804 0 12c.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0C23.512 20.55 23.971 18.196 24 12c-.029-6.185-.484-8.549-4.385-8.816zM9 16V8l8 3.993L9 16z"/>
               </svg>
             </div>
-
-            {/* Channel Name */}
-            <h3 className="font-bold text-gray-900 text-sm md:text-base lg:text-lg mb-3 md:mb-4 leading-tight">
-              {block.channelTitle || 'YouTube'}
-            </h3>
 
             {/* Subscribe Button */}
             <a
@@ -652,21 +643,26 @@ const Block: React.FC<BlockProps> = ({
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="inline-flex items-center gap-1.5 md:gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transition-all px-3 py-1.5 md:px-4 md:py-2 lg:px-5 lg:py-2.5 text-xs md:text-sm lg:text-base"
+              className="inline-flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-full shadow hover:shadow-md transition-all px-2.5 py-1 md:px-3 md:py-1.5 text-[10px] md:text-xs"
             >
               <span>Subscribe</span>
-              <span className="opacity-90 font-medium">{subscriberCount}</span>
+              <span className="opacity-90">{subscriberCount}</span>
             </a>
           </div>
 
-          {/* Right Column: Video Grid 2x2 */}
-          <div className="flex-1 min-w-0">
+          {/* Channel Name */}
+          <h3 className="font-bold text-gray-900 text-xs md:text-sm mb-2 md:mb-2.5 leading-tight">
+            {block.channelTitle || 'YouTube'}
+          </h3>
+
+          {/* Video Grid 2x2 - takes remaining space */}
+          <div className="flex-1 min-h-0">
             {isLoading ? (
               <div className="h-full flex items-center justify-center">
-                <Loader2 className="animate-spin text-gray-300" size={24}/>
+                <Loader2 className="animate-spin text-gray-300" size={18}/>
               </div>
             ) : (
-              <div className="h-full grid grid-cols-2 grid-rows-2 gap-2 md:gap-2.5 lg:gap-3">
+              <div className="h-full grid grid-cols-2 grid-rows-2 gap-1.5 md:gap-2">
                 {displayVideos.length > 0 ? displayVideos.map((vid, idx) => (
                   <a
                     key={idx}
@@ -674,19 +670,19 @@ const Block: React.FC<BlockProps> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="relative overflow-hidden group/vid rounded-xl md:rounded-2xl bg-gray-100 block"
+                    className="relative overflow-hidden group/vid rounded-lg md:rounded-xl bg-gray-100 block"
                   >
                     <img src={vid.thumbnail} alt={vid.title} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/0 group-hover/vid:bg-black/30 transition-colors" />
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/vid:opacity-100 transition-all">
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-red-500 flex items-center justify-center shadow-lg transform group-hover/vid:scale-110 transition-transform">
-                        <Play size={16} className="md:w-5 md:h-5 text-white ml-0.5" fill="white" />
+                      <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-red-500 flex items-center justify-center shadow-lg">
+                        <Play size={12} className="md:w-3.5 md:h-3.5 text-white ml-0.5" fill="white" />
                       </div>
                     </div>
                   </a>
                 )) : (
-                  <div className="col-span-2 row-span-2 flex items-center justify-center text-sm text-gray-400">
-                    <span>No videos found</span>
+                  <div className="col-span-2 row-span-2 flex items-center justify-center text-[10px] text-gray-400">
+                    <span>No videos</span>
                   </div>
                 )}
               </div>

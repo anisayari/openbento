@@ -1303,7 +1303,7 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
                     onChange={(e) => setTempName(e.target.value)}
                     onBlur={saveNameEdit}
                     onKeyDown={handleNameKeyDown}
-                    className="text-4xl font-bold tracking-tight text-gray-900 bg-transparent border-b-2 border-violet-500 outline-none w-full leading-[1.1]"
+                    className="text-xl font-bold tracking-tight text-gray-900 bg-transparent border-b-2 border-violet-500 outline-none w-full leading-[1.1]"
                     placeholder="Your name"
                   />
                 ) : (
@@ -1311,7 +1311,7 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
                     className="group cursor-pointer flex items-center gap-2"
                     onClick={startEditingName}
                   >
-                    <h1 className="text-4xl font-bold tracking-tight text-gray-900 group-hover:text-violet-600 transition-colors leading-[1.1]">
+                    <h1 className="text-xl font-bold tracking-tight text-gray-900 group-hover:text-violet-600 transition-colors leading-[1.1]">
                       {profile.name}
                     </h1>
                     <Pencil size={16} className="text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -1326,13 +1326,13 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
                     onChange={(e) => setTempBio(e.target.value)}
                     onBlur={saveBioEdit}
                     onKeyDown={handleBioKeyDown}
-                    className="text-base text-gray-600 font-medium leading-relaxed bg-transparent border-b-2 border-violet-500 outline-none w-full resize-none"
+                    className="text-sm text-gray-600 font-medium leading-relaxed bg-transparent border-b-2 border-violet-500 outline-none w-full resize-none"
                     rows={3}
                     placeholder="Write something about yourself..."
                   />
                 ) : (
                   <p
-                    className="group text-base text-gray-500 font-medium leading-relaxed whitespace-pre-wrap cursor-pointer hover:text-gray-700 transition-colors flex items-start gap-2"
+                    className="group text-sm text-gray-500 font-medium leading-relaxed whitespace-pre-wrap cursor-pointer hover:text-gray-700 transition-colors flex items-start gap-2"
                     onClick={startEditingBio}
                   >
                     <span className="flex-1">{profile.bio || 'Click to add bio...'}</span>
@@ -1404,8 +1404,8 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
                                      <div className="h-full w-full overflow-y-auto no-scrollbar pb-20 bg-[#F7F7F7]">
                                         <div className="p-6 flex flex-col items-center text-center mt-8">
                                             <img src={profile.avatarUrl} alt="Avatar" className="w-24 h-24 rounded-full mb-4 object-cover ring-2 ring-white shadow-lg"/>
-                                            <h1 className="text-2xl font-bold text-gray-900 leading-tight">{profile.name}</h1>
-                                            <p className="text-sm text-gray-500 mt-2">{profile.bio}</p>
+                                            <h1 className="text-lg font-bold text-gray-900 leading-tight">{profile.name}</h1>
+                                            <p className="text-xs text-gray-500 mt-1.5">{profile.bio}</p>
                                             {/* Social icons row in mobile */}
                                             {profile.showSocialInHeader && profile.socialAccounts && profile.socialAccounts.length > 0 && (
                                               <div className="flex flex-wrap justify-center gap-2 mt-4">
@@ -1799,8 +1799,8 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
 	                       <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center text-green-700 mb-3">
 	                           <Share2 size={18}/>
 	                       </div>
-	                       <h2 className="text-xl font-bold text-gray-900">Deploy</h2>
-	                       <p className="text-gray-500 mt-1 text-sm">
+	                       <h2 className="text-base font-bold text-gray-900">Deploy</h2>
+	                       <p className="text-gray-500 mt-1 text-xs">
 	                         Download the package, then follow <code>DEPLOY.md</code> inside.
 	                       </p>
 	                   </div>
@@ -1902,7 +1902,7 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
                        <div className="w-9 h-9 bg-violet-100 rounded-full flex items-center justify-center text-violet-700 mb-3">
                            <BarChart3 size={18}/>
                        </div>
-                       <h2 className="text-xl font-bold text-gray-900">Analytics</h2>
+                       <h2 className="text-base font-bold text-gray-900">Analytics</h2>
                        <p className="text-gray-500 mt-1 text-sm">
                          Site ID: <span className="font-mono text-xs">{activeBento?.id || '—'}</span>
                        </p>

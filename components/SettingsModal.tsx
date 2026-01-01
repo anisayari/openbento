@@ -259,8 +259,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 <div className="w-9 h-9 bg-gray-900 rounded-full flex items-center justify-center text-white mb-3">
                   <Settings size={18} />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">Settings</h2>
-                <p className="text-gray-500 mt-1 text-sm">Profile, social accounts, and configuration.</p>
+                <h2 className="text-base font-bold text-gray-900">Settings</h2>
+                <p className="text-gray-500 mt-1 text-xs">Profile, social accounts, and configuration.</p>
               </div>
               <button
                 onClick={onClose}
