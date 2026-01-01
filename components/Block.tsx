@@ -562,30 +562,14 @@ const Block: React.FC<BlockProps> = ({
     const displayVideos = activeVideos.slice(0, 4);
     const subscriberCount = block.subscriberCount; // Only show if defined
 
-    // Responsive layout based on aspect ratio
+    // Responsive layout based on grid units (colSpan vs rowSpan)
+    // If wider than tall in grid units → landscape (text left, grid right)
+    // If taller than wide in grid units → portrait (text top, grid bottom)
+    const isLandscape = block.colSpan > block.rowSpan;
+
     const YouTubeGridContent = () => {
-      const containerRef = useRef<HTMLDivElement>(null);
-      const [isLandscape, setIsLandscape] = useState(true);
-
-      useEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
-
-        const checkAspectRatio = () => {
-          const { width, height } = container.getBoundingClientRect();
-          setIsLandscape(width > height);
-        };
-
-        checkAspectRatio();
-        const resizeObserver = new ResizeObserver(checkAspectRatio);
-        resizeObserver.observe(container);
-
-        return () => resizeObserver.disconnect();
-      }, []);
-
       return (
         <div
-          ref={containerRef}
           className={`w-full h-full p-2 md:p-3 flex gap-2 md:gap-3 ${isLandscape ? 'flex-row' : 'flex-col'}`}
         >
           {/* Header: YouTube icon, channel name, subscribe button */}

@@ -1166,20 +1166,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     window.addEventListener('pagehide', trackSessionEnd);
 
-    // YouTube Grid Responsive Layout (aspect ratio based)
-    const ytGrids = document.querySelectorAll('.yt-grid-new');
-    const ytResizeObserver = new ResizeObserver(entries => {
-        entries.forEach(entry => {
-            const { width, height } = entry.contentRect;
-            if (height > width) {
-                entry.target.classList.add('yt-portrait');
-            } else {
-                entry.target.classList.remove('yt-portrait');
-            }
-        });
-    });
-    ytGrids.forEach(grid => ytResizeObserver.observe(grid));
-
     // YouTube Fetcher
     const fetchers = document.querySelectorAll('.youtube-fetcher');
     fetchers.forEach(async (el) => {
@@ -1358,8 +1344,11 @@ const generateHtml = (data: SiteData, imageMap: Record<string, string>): string 
              const subscriberCount = block.subscriberCount ? escapeHtml(block.subscriberCount) : '';
              const subscribeUrl = safeChannelId ? `https://youtube.com/channel/${safeChannelId}?sub_confirmation=1` : '#';
              const subCountHtml = subscriberCount ? `<span class="yt-sub-count">${subscriberCount}</span>` : '';
+             // Portrait layout if rowSpan >= colSpan (taller or equal)
+             const isPortrait = block.rowSpan >= block.colSpan;
+             const portraitClass = isPortrait ? ' yt-portrait' : '';
              contentHtml = `
-             <div class="youtube-fetcher yt-grid-new" ${fetcherAttrs}>
+             <div class="youtube-fetcher yt-grid-new${portraitClass}" ${fetcherAttrs}>
                 <div class="yt-header">
                     <div class="yt-logo">
                         <svg viewBox="0 0 24 24" fill="white"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0C.488 3.45.029 5.804 0 12c.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0C23.512 20.55 23.971 18.196 24 12c-.029-6.185-.484-8.549-4.385-8.816zM9 16V8l8 3.993L9 16z"/></svg>
