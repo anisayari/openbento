@@ -66,10 +66,11 @@ interface BlockProps {
   isDragging?: boolean;
   onEdit: (block: BlockData) => void;
   onDelete: (id: string) => void;
-  onDragStart: (id: string) => void;
+  onDragStart: (id: string, event: React.DragEvent) => void;
   onDragEnter: (id: string) => void;
   onDragEnd: () => void;
-  onDrop: (id: string) => void;
+  onDrop: (id: string, event: React.DragEvent) => void;
+  onDragOver?: (event: React.DragEvent) => void;
   enableResize?: boolean;
   isResizing?: boolean;
   onResizeStart?: (block: BlockData, e: React.PointerEvent<HTMLButtonElement>) => void;
@@ -89,6 +90,7 @@ const Block: React.FC<BlockProps> = ({
   onDragEnter,
   onDragEnd,
   onDrop,
+  onDragOver,
   enableResize,
   isResizing,
   onResizeStart,
@@ -399,12 +401,18 @@ const Block: React.FC<BlockProps> = ({
                 e.preventDefault();
                 return;
               }
-              onDragStart(block.id);
+              onDragStart(block.id, e);
             }}
             onDragEnter={() => onDragEnter(block.id)}
-            onDragOver={(e) => e.preventDefault()}
+            onDragOver={(e) => {
+              e.preventDefault();
+              onDragOver?.(e);
+            }}
             onDragEnd={onDragEnd}
-            onDrop={(e) => { e.preventDefault(); onDrop(block.id); }}
+            onDrop={(e) => {
+              e.preventDefault();
+              onDrop(block.id, e);
+            }}
             onClick={() => onEdit(block)}
             data-block-id={block.id}
             className={`
@@ -464,12 +472,18 @@ const Block: React.FC<BlockProps> = ({
             e.preventDefault();
             return;
           }
-          onDragStart(block.id);
+          onDragStart(block.id, e);
         }}
         onDragEnter={() => onDragEnter(block.id)}
-        onDragOver={(e) => e.preventDefault()}
+        onDragOver={(e) => {
+          e.preventDefault();
+          onDragOver?.(e);
+        }}
         onDragEnd={onDragEnd}
-        onDrop={(e) => { e.preventDefault(); onDrop(block.id); }}
+        onDrop={(e) => {
+          e.preventDefault();
+          onDrop(block.id, e);
+        }}
         onClick={(e) => {
           if (e.ctrlKey || e.metaKey) return; // Allow link click
           e.preventDefault();
@@ -656,12 +670,18 @@ const Block: React.FC<BlockProps> = ({
             e.preventDefault();
             return;
           }
-          onDragStart(block.id);
+          onDragStart(block.id, e);
         }}
         onDragEnter={() => onDragEnter(block.id)}
-        onDragOver={(e) => e.preventDefault()}
+        onDragOver={(e) => {
+          e.preventDefault();
+          onDragOver?.(e);
+        }}
         onDragEnd={onDragEnd}
-        onDrop={(e) => { e.preventDefault(); onDrop(block.id); }}
+        onDrop={(e) => {
+          e.preventDefault();
+          onDrop(block.id, e);
+        }}
         onClick={() => {
           if (!previewMode) {
             onEdit(block);
@@ -734,12 +754,18 @@ const Block: React.FC<BlockProps> = ({
           e.preventDefault();
           return;
         }
-        onDragStart(block.id);
+        onDragStart(block.id, e);
       }}
       onDragEnter={() => onDragEnter(block.id)}
-      onDragOver={(e) => e.preventDefault()}
+      onDragOver={(e) => {
+        e.preventDefault();
+        onDragOver?.(e);
+      }}
       onDragEnd={onDragEnd}
-      onDrop={(e) => { e.preventDefault(); onDrop(block.id); }}
+      onDrop={(e) => {
+        e.preventDefault();
+        onDrop(block.id, e);
+      }}
       onClick={() => {
         if (previewMode) {
           // In preview mode, navigate to block URL with security validation

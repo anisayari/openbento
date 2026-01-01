@@ -22,6 +22,17 @@ const MAX_ROW_SPAN = 50; // Allow tall blocks for scrollable content
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
+type DragSession = {
+  startPointerX: number;
+  startPointerY: number;
+  startLeft: number;
+  startTop: number;
+  blockWidth: number;
+  blockHeight: number;
+  cellWidth: number;
+  cellHeight: number;
+};
+
 // Migrate blocks from old 3-col grid to new 9-col grid
 // Old blocks had colSpan 1-3, new blocks use colSpan 1-9
 // Regular blocks (not SOCIAL_ICON) should take 3x3 cells minimum
@@ -366,8 +377,8 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
   const gridRef = useRef<HTMLElement | null>(null);
-  // Store the offset from mouse to block's top-left corner when dragging
-  const dragOffsetRef = useRef<{ col: number; row: number }>({ col: 0, row: 0 });
+  // Track drag geometry so placement is based on block bounds, not cursor cell.
+  const dragSessionRef = useRef<DragSession | null>(null);
   const resizeSessionRef = useRef<{
     blockId: string;
     startCol: number;
@@ -892,73 +903,166 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
       setIsSidebarOpen(false);
   };
 
-  const handleDragStart = (id: string) => {
+  const getGridCellFromPointer = useCallback((clientX: number, clientY: number) => {
+    const grid = gridRef.current;
+    if (!grid) return null;
+
+    const rect = grid.getBoundingClientRect();
+    const style = window.getComputedStyle(grid);
+    const colGap = parseFloat(style.columnGap || '0') || 0;
+    const rowGap = parseFloat(style.rowGap || '0') || 0;
+    const rowHeight = 64; // Fixed 64px row height
+
+    const usableWidth = Math.max(0, rect.width - colGap * (GRID_COLS - 1));
+    const colWidth = usableWidth / GRID_COLS || 1;
+
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+
+    // Use ceil for more responsive resizing (resize as soon as pointer enters new cell)
+    const col = clamp(Math.ceil(x / (colWidth + colGap)), 1, GRID_COLS);
+    const row = Math.max(1, Math.ceil(y / (rowHeight + rowGap))); // No upper limit for rows
+
+    return { col, row };
+  }, []);
+
+  const handleDragStart = (id: string, event: React.DragEvent) => {
     setDraggedBlockId(id);
-  };
 
-  const handleDragEnter = (targetId: string) => {
-    if (draggedBlockId && draggedBlockId !== targetId) {
-      setDragOverBlockId(targetId);
-      setDragOverSlotIndex(null);
+    const grid = gridRef.current;
+    if (!grid) {
+      dragSessionRef.current = null;
+      return;
     }
+
+    const gridRect = grid.getBoundingClientRect();
+    const blockRect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    const style = window.getComputedStyle(grid);
+    const colGap = parseFloat(style.columnGap || '0') || 0;
+    const rowGap = parseFloat(style.rowGap || '0') || 0;
+    const rowHeight = 64; // Fixed 64px row height
+
+    const usableWidth = Math.max(0, gridRect.width - colGap * (GRID_COLS - 1));
+    const colWidth = usableWidth / GRID_COLS || 1;
+
+    dragSessionRef.current = {
+      startPointerX: event.clientX,
+      startPointerY: event.clientY,
+      startLeft: blockRect.left - gridRect.left + grid.scrollLeft,
+      startTop: blockRect.top - gridRect.top + grid.scrollTop,
+      blockWidth: blockRect.width,
+      blockHeight: blockRect.height,
+      cellWidth: colWidth + colGap,
+      cellHeight: rowHeight + rowGap,
+    };
   };
 
-  const handleDragEnterSlot = (slotIndex: number) => {
+  const getDragTargetFromEvent = (event: React.DragEvent, sourceBlock: BlockData) => {
+    const session = dragSessionRef.current;
+    if (!session || session.cellWidth <= 0 || session.cellHeight <= 0) return null;
+
+    const dx = event.clientX - session.startPointerX;
+    const dy = event.clientY - session.startPointerY;
+
+    const left = session.startLeft + dx;
+    const top = session.startTop + dy;
+
+    const movingRight = dx >= 0;
+    const movingDown = dy >= 0;
+
+    const edgeX = movingRight ? left + session.blockWidth : left;
+    const edgeY = movingDown ? top + session.blockHeight : top;
+
+    const edgeCol = movingRight
+      ? Math.ceil(edgeX / session.cellWidth)
+      : Math.floor(edgeX / session.cellWidth) + 1;
+    const edgeRow = movingDown
+      ? Math.ceil(edgeY / session.cellHeight)
+      : Math.floor(edgeY / session.cellHeight) + 1;
+
+    const neededCols = Math.min(sourceBlock.colSpan, GRID_COLS);
+    const baseCol = movingRight ? edgeCol - neededCols + 1 : edgeCol;
+    const baseRow = movingDown ? edgeRow - sourceBlock.rowSpan + 1 : edgeRow;
+
+    const clampedCol = clamp(baseCol, 1, GRID_COLS - neededCols + 1);
+    const clampedRow = Math.max(1, baseRow);
+
+    return { col: clampedCol, row: clampedRow };
+  };
+
+  const handleDragEnter = (_targetId: string) => {
     if (draggedBlockId) {
-      setDragOverSlotIndex(slotIndex);
       setDragOverBlockId(null);
     }
+  };
+
+  const handleDragOverSlot = (event: React.DragEvent) => {
+    if (!draggedBlockId) return;
+    event.preventDefault();
+
+    const draggedBlock = blocks.find(b => b.id === draggedBlockId);
+    if (!draggedBlock) return;
+
+    const target = getDragTargetFromEvent(event, draggedBlock);
+    if (!target) return;
+
+    setDragOverSlotIndex(target.col * 100 + target.row);
+    setDragOverBlockId(null);
   };
 
   const handleDragEnd = () => {
     setDraggedBlockId(null);
     setDragOverBlockId(null);
     setDragOverSlotIndex(null);
+    dragSessionRef.current = null;
   };
 
-  const handleDrop = (targetId: string) => {
-    if (!draggedBlockId || draggedBlockId === targetId) {
-        handleDragEnd();
-        return;
+  const applyDropFromEvent = (event: React.DragEvent) => {
+    event.preventDefault();
+    if (!draggedBlockId) {
+      handleDragEnd();
+      return;
     }
+
     const sourceIndex = blocks.findIndex(b => b.id === draggedBlockId);
-    const targetIndex = blocks.findIndex(b => b.id === targetId);
-
-    if (sourceIndex === -1 || targetIndex === -1) {
-        handleDragEnd();
-        return;
+    if (sourceIndex === -1) {
+      handleDragEnd();
+      return;
     }
-    
-    const sourceBlock = blocks[sourceIndex];
-    const targetBlock = blocks[targetIndex];
 
-    
-    // Move source block to target's position
+    const sourceBlock = blocks[sourceIndex];
+    const target = getDragTargetFromEvent(event, sourceBlock);
+    if (!target) {
+      handleDragEnd();
+      return;
+    }
+
+    // Move source block based on its bounds, not the hovered cell.
     let newBlocks = blocks.map(b => {
       if (b.id === sourceBlock.id) {
         return {
           ...b,
-          gridColumn: targetBlock.gridColumn,
-          gridRow: targetBlock.gridRow,
+          gridColumn: target.col,
+          gridRow: target.row,
         };
       }
       return b;
     });
-    
+
     // Find all blocks that now conflict with the moved source block
     const movedSource = newBlocks.find(b => b.id === sourceBlock.id)!;
-    
+
     // Find conflicting blocks and relocate them
-    const conflictingBlocks = newBlocks.filter(b => 
+    const conflictingBlocks = newBlocks.filter(b =>
       b.id !== movedSource.id && blocksOverlap(movedSource, b)
     );
-    
+
     if (conflictingBlocks.length > 0) {
       // Relocate each conflicting block one by one
       conflictingBlocks.forEach(conflictBlock => {
         const occupiedCells = getOccupiedCells(newBlocks, [conflictBlock.id]);
         const newPos = findNextAvailablePosition(conflictBlock, occupiedCells);
-        
+
         newBlocks = newBlocks.map(b => {
           if (b.id === conflictBlock.id) {
             return { ...b, gridColumn: newPos.col, gridRow: newPos.row };
@@ -967,9 +1071,13 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
         });
       });
     }
-    
+
     handleSetBlocks(newBlocks);
     handleDragEnd();
+  };
+
+  const handleDrop = (_targetId: string, event: React.DragEvent) => {
+    applyDropFromEvent(event);
   };
 
   const handleDropAtSlot = (slotIndex: number) => {
@@ -993,29 +1101,6 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
     handleSetBlocks(newBlocks);
     handleDragEnd();
   };
-
-  const getGridCellFromPointer = useCallback((clientX: number, clientY: number) => {
-    const grid = gridRef.current;
-    if (!grid) return null;
-
-    const rect = grid.getBoundingClientRect();
-    const style = window.getComputedStyle(grid);
-    const colGap = parseFloat(style.columnGap || '0') || 0;
-    const rowGap = parseFloat(style.rowGap || '0') || 0;
-    const rowHeight = 64; // Fixed 64px row height
-
-    const usableWidth = Math.max(0, rect.width - colGap * (GRID_COLS - 1));
-    const colWidth = usableWidth / GRID_COLS || 1;
-
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
-
-    // Use ceil for more responsive resizing (resize as soon as pointer enters new cell)
-    const col = clamp(Math.ceil(x / (colWidth + colGap)), 1, GRID_COLS);
-    const row = Math.max(1, Math.ceil(y / (rowHeight + rowGap))); // No upper limit for rows
-
-    return { col, row };
-  }, []);
 
   const handleResizeStart = useCallback(
     (block: BlockData, e: React.PointerEvent<HTMLButtonElement>) => {
@@ -1458,10 +1543,10 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
                                                         isSelected={false}
                                                         onEdit={() => {}}
                                                         onDelete={() => {}}
-                                                        onDragStart={() => {}}
+                                                        onDragStart={(_id, _event) => {}}
                                                         onDragEnter={() => {}}
                                                         onDragEnd={() => {}}
-                                                        onDrop={() => {}}
+                                                        onDrop={(_id, _event) => {}}
                                                         enableTiltEffect={true}
                                                     />
                                                   </div>
@@ -1558,25 +1643,8 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
                                     }
                                 }
 
-                                const handleDropOnCell = (col: number, row: number) => {
-                                    if (!draggedBlockId) return;
-                                    const blockIndex = blocks.findIndex(b => b.id === draggedBlockId);
-                                    if (blockIndex === -1) return;
-
-                                    const sourceBlock = blocks[blockIndex];
-
-                                    // Simple positioning: place block's top-left at the drop cell
-                                    // Clamp to grid bounds (columns only, rows unlimited)
-                                    const clampedCol = Math.max(1, Math.min(col, GRID_COLS - sourceBlock.colSpan + 1));
-                                    const clampedRow = Math.max(1, row);
-
-                                    // Move source block to new position
-                                    // Move to end of array so it appears on top
-                                    const movedBlock = { ...sourceBlock, gridColumn: clampedCol, gridRow: clampedRow };
-                                    const newBlocks = [...blocks.filter(b => b.id !== sourceBlock.id), movedBlock];
-
-                                    handleSetBlocks(newBlocks);
-                                    handleDragEnd();
+                                const handleDropOnCell = (event: React.DragEvent) => {
+                                    applyDropFromEvent(event);
                                 };
 
                                 const handleClickEmptyCell = (col: number, row: number) => {
@@ -1611,6 +1679,7 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
                                                 onDelete={deleteBlock}
                                                 onDragStart={handleDragStart}
                                                 onDragEnter={handleDragEnter}
+                                                onDragOver={handleDragOverSlot}
                                                 onDragEnd={handleDragEnd}
                                                 onDrop={handleDrop}
                                                 onInlineUpdate={updateBlock}
@@ -1628,9 +1697,9 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
                                                     gridColumnStart: col,
                                                     gridRowStart: row,
                                                 }}
-                                                onDragEnter={() => setDragOverSlotIndex(col * 100 + row)}
-                                                onDragOver={(e) => e.preventDefault()}
-                                                onDrop={(e) => { e.preventDefault(); handleDropOnCell(col, row); }}
+                                                onDragEnter={handleDragOverSlot}
+                                                onDragOver={handleDragOverSlot}
+                                                onDrop={handleDropOnCell}
                                                 onClick={() => handleClickEmptyCell(col, row)}
                                                 className={`border border-dashed rounded-md flex items-center justify-center transition-all duration-200 group cursor-pointer ${
                                                     draggedBlockId

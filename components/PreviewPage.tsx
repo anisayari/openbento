@@ -76,6 +76,8 @@ const PreviewPage: React.FC = () => {
   const blocks = bento.data.blocks;
   const noop = () => {};
   const noopId = (_id: string) => {};
+  const noopDrag = (_id: string, _event: React.DragEvent) => {};
+  const noopDrop = (_id: string, _event: React.DragEvent) => {};
   const noopBlock = (_block: BlockData) => {};
 
   // Render social icons for header
@@ -273,10 +275,10 @@ const PreviewPage: React.FC = () => {
                         onResizeStart={undefined}
                         onEdit={noopBlock}
                         onDelete={noopId}
-                        onDragStart={noopId}
+                        onDragStart={noopDrag}
                         onDragEnter={noopId}
                         onDragEnd={noop}
-                        onDrop={noopId}
+                        onDrop={noopDrop}
                         enableTiltEffect={true}
                         previewMode={true}
                       />
