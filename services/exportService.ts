@@ -796,6 +796,140 @@ body {
   font-weight: 500;
 }
 
+/* YouTube Grid New Design */
+.yt-grid-new {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1rem;
+  gap: 0.75rem;
+}
+
+.yt-grid-new.yt-large {
+  flex-direction: row;
+  padding: 1.25rem;
+  gap: 1.5rem;
+}
+
+.yt-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.yt-large .yt-left {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: 33%;
+  gap: 0.5rem;
+}
+
+.yt-logo {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+  flex-shrink: 0;
+}
+
+.yt-logo svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.yt-large .yt-logo {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.yt-large .yt-logo svg {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.yt-channel-name {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #111827;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.yt-large .yt-channel-name {
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  white-space: normal;
+}
+
+.yt-subscribe-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ef4444;
+  color: white;
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  text-decoration: none;
+  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.25);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.yt-subscribe-btn:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(239, 68, 68, 0.35);
+}
+
+.yt-large .yt-subscribe-btn {
+  font-size: 0.875rem;
+  padding: 0.625rem 1.25rem;
+}
+
+.yt-sub-count {
+  opacity: 0.9;
+}
+
+.yt-right {
+  flex: 1;
+  min-height: 0;
+}
+
+.yt-video-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 0.5rem;
+  height: 100%;
+}
+
+.yt-loading {
+  grid-column: span 2;
+  grid-row: span 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+.yt-video-grid .yt-thumb-card {
+  aspect-ratio: 16/9;
+  height: auto;
+}
+
 /* Footer */
 footer {
   width: 100%;
@@ -1069,33 +1203,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if(mode === 'grid' || mode === 'list') {
                 if(container) {
-                    container.innerHTML = videos.map(v => {
-                        if(isTall) {
-                            // Tall block - horizontal list items
-                            return \`<a href="https://www.youtube.com/watch?v=\${v.id}" target="_blank" class="yt-thumb-card">
-                                <div class="thumb-wrapper">
-                                    <img src="\${v.thumb}" loading="lazy"/>
-                                    <div class="yt-overlay">
-                                        <div class="yt-play-btn">
-                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                                        </div>
-                                    </div>
+                    // New grid design with rounded thumbnails
+                    container.innerHTML = videos.slice(0, 4).map(v => {
+                        return \`<a href="https://www.youtube.com/watch?v=\${v.id}" target="_blank" class="yt-thumb-card">
+                            <img src="\${v.thumb}" loading="lazy"/>
+                            <div class="yt-overlay">
+                                <div class="yt-play-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><polygon points="10 8 16 12 10 16 10 8"/></svg>
                                 </div>
-                                <div class="meta"><div class="title">\${v.title}</div></div>
-                            </a>\`;
-                        } else {
-                            // Grid mode (default)
-                            const playSize = isSmall ? 12 : 16;
-                            return \`<a href="https://www.youtube.com/watch?v=\${v.id}" target="_blank" class="yt-thumb-card">
-                                <img src="\${v.thumb}" loading="lazy"/>
-                                <div class="yt-overlay">
-                                    <div class="yt-play-btn">
-                                        <svg width="\${playSize}" height="\${playSize}" viewBox="0 0 24 24" fill="white"><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                                    </div>
-                                </div>
-                                <div class="yt-caption">\${v.title}</div>
-                            </a>\`;
-                        }
+                            </div>
+                        </a>\`;
                     }).join('');
                 }
             } else {
@@ -1224,20 +1341,25 @@ const generateHtml = (data: SiteData, imageMap: Record<string, string>): string 
         const fetcherAttrs = `data-channel-id="${escapeAttr(safeChannelId)}" data-mode="${escapeAttr(mode)}" data-size="${escapeAttr(sizeClass)}"`;
 
         if (isMulti) {
-             const videosToShow = isSmall ? 2 : 4;
+             const isLargeBlock = block.colSpan >= 3 && block.rowSpan >= 2;
+             const subscriberCount = escapeHtml(block.subscriberCount) || '139K';
+             const subscribeUrl = safeChannelId ? `https://youtube.com/channel/${safeChannelId}?sub_confirmation=1` : '#';
              contentHtml = `
-             <div class="youtube-fetcher yt-container ${sizeClass}" ${fetcherAttrs}>
-                <div class="yt-header">
-                    <div class="yt-icon">
-                        <svg width="${isSmall ? 14 : 18}" height="${isSmall ? 14 : 18}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"/><path d="m10 15 5-3-5-3z"/></svg>
+             <div class="youtube-fetcher yt-grid-new ${isLargeBlock ? 'yt-large' : ''}" ${fetcherAttrs}>
+                <div class="yt-left">
+                    <div class="yt-logo">
+                        <svg viewBox="0 0 24 24" fill="white"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0C.488 3.45.029 5.804 0 12c.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0C23.512 20.55 23.971 18.196 24 12c-.029-6.185-.484-8.549-4.385-8.816zM9 16V8l8 3.993L9 16z"/></svg>
                     </div>
-                    <div class="yt-header-text">
-                        <h3 data-role="channel-title">${escapeHtml(block.channelTitle) || 'YouTube'}</h3>
-                        <span>Latest Videos</span>
-                    </div>
+                    <h3 class="yt-channel-name" data-role="channel-title">${escapeHtml(block.channelTitle) || 'YouTube'}</h3>
+                    <a href="${escapeAttr(subscribeUrl)}" target="_blank" rel="noopener noreferrer" class="yt-subscribe-btn">
+                        <span>Subscribe</span>
+                        <span class="yt-sub-count">${subscriberCount}</span>
+                    </a>
                 </div>
-                <div data-role="video-container" data-max-videos="${videosToShow}" class="yt-videos">
-                    <div style="grid-column: span 2; text-align:center; padding:1rem; color:#9ca3af; font-size:0.75rem;">Loading...</div>
+                <div class="yt-right">
+                    <div data-role="video-container" data-max-videos="4" class="yt-video-grid">
+                        <div class="yt-loading">Loading...</div>
+                    </div>
                 </div>
              </div>`;
         } else {

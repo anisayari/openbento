@@ -69,6 +69,7 @@ export interface BlockData {
   channelTitle?: string;
   youtubeMode?: 'single' | 'grid' | 'list';
   youtubeVideos?: Array<{ id: string; title: string; thumbnail: string }>;
+  subscriberCount?: string; // e.g. "139K", "1.5M"
 
   // Social platform (non-YouTube mode)
   socialPlatform?: SocialPlatform;

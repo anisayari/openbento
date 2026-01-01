@@ -560,26 +560,14 @@ const Block: React.FC<BlockProps> = ({
   // ===== YOUTUBE GRID/LIST LAYOUT (ADAPTIVE) =====
   if (isYoutubeGrid || isYoutubeList) {
     // Adaptive layout based on block size
-    const isLargeBlock = block.colSpan >= 2 && block.rowSpan >= 2; // 2x2 or larger
-    const isWideBlock = block.colSpan >= 2 && block.rowSpan === 1; // 2x1
-    const isTallBlock = block.colSpan === 1 && block.rowSpan >= 2; // 1x2
-    const isSmallBlock = block.colSpan === 1 && block.rowSpan === 1; // 1x1
-    
-    // Determine display mode based on size
-    const showTitles = isLargeBlock || isTallBlock;
-    const videosToShow = isSmallBlock ? 2 : (isWideBlock ? 2 : 4);
-    const displayVideos = activeVideos.slice(0, videosToShow);
-    
-    // Grid configuration
-    const getGridClass = () => {
-      if (isSmallBlock) return 'grid grid-cols-2 gap-1.5';
-      if (isWideBlock) return 'grid grid-cols-2 gap-2';
-      if (isTallBlock) return 'flex flex-col gap-2';
-      return 'grid grid-cols-2 gap-2'; // Large block
-    };
+    const isLargeBlock = block.colSpan >= 3 && block.rowSpan >= 2; // 3x2 or larger (for 2-column layout)
+    const isSmallBlock = block.colSpan <= 2 || block.rowSpan === 1;
 
-	    return (
-      <motion.div 
+    const displayVideos = activeVideos.slice(0, 4);
+    const subscriberCount = block.subscriberCount || '139K'; // Default for demo
+
+    return (
+      <motion.div
         layoutId={block.id}
         layout
         draggable={!isResizing}
@@ -599,9 +587,7 @@ const Block: React.FC<BlockProps> = ({
         onDragEnd={onDragEnd}
         onDrop={(e) => { e.preventDefault(); onDrop(block.id); }}
         onClick={() => {
-          if (previewMode && block.channelId && isValidYouTubeChannelId(block.channelId)) {
-            openSafeUrl(`https://youtube.com/channel/${block.channelId}`);
-          } else if (!previewMode) {
+          if (!previewMode) {
             onEdit(block);
           }
         }}
@@ -626,52 +612,98 @@ const Block: React.FC<BlockProps> = ({
         {isDragTarget && (
           <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-1.5 h-16 bg-violet-500 rounded-full shadow-md shadow-violet-500/30 animate-pulse z-30" />
         )}
-	        {resizeHandle}
+        {resizeHandle}
 
-	        {/* YouTube Grid Layout */}
-	        <div className="w-full h-full flex flex-col p-2 md:p-3">
-          {/* Header with YouTube icon and channel name */}
-          <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-100">
-            <div className="w-6 h-6 md:w-7 md:h-7 rounded-lg bg-red-600 text-white flex items-center justify-center shrink-0">
-              <Youtube size={12} className="md:w-[14px] md:h-[14px]"/>
+        {/* Delete button - appears on hover (not in preview mode) */}
+        {!previewMode && (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onDelete(block.id);
+            }}
+            className="absolute top-2 left-2 p-1.5 bg-red-500/80 hover:bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity z-20 backdrop-blur-sm"
+            title="Delete block"
+          >
+            <Trash2 size={14} />
+          </button>
+        )}
+
+        {/* YouTube Grid Layout - Two column design */}
+        <div className={`w-full h-full p-3 md:p-4 ${isLargeBlock ? 'flex gap-4' : 'flex flex-col'}`}>
+
+          {/* Left Column: YouTube icon, name, subscribe button */}
+          <div className={`${isLargeBlock ? 'w-1/3 flex flex-col justify-center' : 'flex items-center gap-3 mb-3'}`}>
+            {/* YouTube Icon */}
+            <div className={`${isLargeBlock ? 'mb-3' : ''}`}>
+              <div className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-xl bg-red-500 flex items-center justify-center shadow-md">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="white"
+                  className="w-5 h-5 md:w-6 md:h-6 lg:w-7 lg:h-7"
+                >
+                  <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0C.488 3.45.029 5.804 0 12c.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0C23.512 20.55 23.971 18.196 24 12c-.029-6.185-.484-8.549-4.385-8.816zM9 16V8l8 3.993L9 16z"/>
+                </svg>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="text-[10px] md:text-xs font-bold text-gray-900 truncate">{block.channelTitle || 'YouTube'}</h3>
-              <span className="text-[8px] md:text-[9px] text-gray-400 font-medium">Latest videos</span>
+
+            {/* Channel Name */}
+            <div className={`${isLargeBlock ? 'mb-4' : 'flex-1 min-w-0'}`}>
+              <h3 className={`font-bold text-gray-900 ${isLargeBlock ? 'text-base md:text-lg lg:text-xl' : 'text-sm md:text-base truncate'}`}>
+                {block.channelTitle || 'YouTube'}
+              </h3>
             </div>
+
+            {/* Subscribe Button */}
+            <a
+              href={block.channelId && isValidYouTubeChannelId(block.channelId) ? `https://youtube.com/channel/${block.channelId}?sub_confirmation=1` : '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className={`inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-full shadow-md hover:shadow-lg transition-all ${
+                isLargeBlock
+                  ? 'px-4 py-2 md:px-5 md:py-2.5 text-sm md:text-base'
+                  : 'px-3 py-1.5 text-xs md:text-sm ml-auto'
+              }`}
+            >
+              <span>Subscribe</span>
+              <span className="opacity-90">{subscriberCount}</span>
+            </a>
           </div>
 
-          {/* Videos Grid - Each video is clickable */}
-          {isLoading ? (
-            <div className="flex-1 flex items-center justify-center">
-              <Loader2 className="animate-spin text-gray-300" size={16}/>
-            </div>
-          ) : (
-            <div className="flex-1 grid grid-cols-2 gap-1 md:gap-1.5 overflow-hidden">
-              {displayVideos.length > 0 ? displayVideos.slice(0, 4).map((vid, idx) => (
-                <a
-                  key={idx}
-                  href={`https://youtube.com/watch?v=${vid.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()}
-                  className="relative overflow-hidden group/vid rounded bg-gray-100 block"
-                >
-                  <img src={vid.thumbnail} alt={vid.title} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/20 group-hover/vid:bg-black/40 transition-colors" />
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/vid:opacity-100 transition-all">
-                    <div className="w-6 h-6 md:w-7 md:h-7 rounded-full bg-red-500 flex items-center justify-center shadow-lg">
-                      <Play size={10} className="md:w-3 md:h-3 text-white ml-0.5" fill="white" />
+          {/* Right Column: Video Grid */}
+          <div className={`${isLargeBlock ? 'flex-1' : 'flex-1'}`}>
+            {isLoading ? (
+              <div className="h-full flex items-center justify-center">
+                <Loader2 className="animate-spin text-gray-300" size={20}/>
+              </div>
+            ) : (
+              <div className="h-full grid grid-cols-2 grid-rows-2 gap-1.5 md:gap-2">
+                {displayVideos.length > 0 ? displayVideos.map((vid, idx) => (
+                  <a
+                    key={idx}
+                    href={`https://youtube.com/watch?v=${vid.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="relative overflow-hidden group/vid rounded-lg md:rounded-xl bg-gray-100 block aspect-video"
+                  >
+                    <img src={vid.thumbnail} alt={vid.title} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/0 group-hover/vid:bg-black/30 transition-colors" />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/vid:opacity-100 transition-all">
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-red-500 flex items-center justify-center shadow-lg transform group-hover/vid:scale-110 transition-transform">
+                        <Play size={14} className="md:w-4 md:h-4 text-white ml-0.5" fill="white" />
+                      </div>
                     </div>
+                  </a>
+                )) : (
+                  <div className="col-span-2 row-span-2 flex items-center justify-center text-sm text-gray-400">
+                    <span>No videos found</span>
                   </div>
-                </a>
-              )) : (
-                <div className="col-span-2 flex items-center justify-center text-[9px] text-gray-400">
-                  <span>No videos</span>
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </motion.div>
     );
