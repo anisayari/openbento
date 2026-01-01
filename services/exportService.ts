@@ -796,60 +796,65 @@ body {
   font-weight: 500;
 }
 
-/* YouTube Grid New Design - Vertical layout */
+/* YouTube Grid New Design - Horizontal layout: text left, grid right */
 .yt-grid-new {
   display: flex;
-  flex-direction: column;
   height: 100%;
-  padding: 0.625rem;
-  gap: 0.375rem;
-}
-
-.yt-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  padding: 0.5rem;
   gap: 0.5rem;
 }
 
+.yt-left {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .yt-logo {
-  width: 2rem;
-  height: 2rem;
-  border-radius: 0.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.375rem;
   background: #ef4444;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
-  flex-shrink: 0;
+  margin-bottom: 0.375rem;
 }
 
 .yt-logo svg {
-  width: 1rem;
-  height: 1rem;
+  width: 0.875rem;
+  height: 0.875rem;
 }
 
 .yt-channel-name {
-  font-size: 0.75rem;
+  font-size: 0.5625rem;
   font-weight: 700;
   color: #111827;
   margin-bottom: 0.375rem;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .yt-subscribe-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.125rem;
   background: #ef4444;
   color: white;
   font-weight: 600;
-  font-size: 0.625rem;
-  padding: 0.25rem 0.625rem;
+  font-size: 0.5rem;
+  padding: 0.25rem 0.5rem;
   border-radius: 9999px;
   text-decoration: none;
   box-shadow: 0 2px 4px rgba(239, 68, 68, 0.25);
   transition: all 0.2s ease;
-  flex-shrink: 0;
+  align-self: flex-start;
 }
 
 .yt-subscribe-btn:hover {
@@ -862,14 +867,14 @@ body {
 
 .yt-right {
   flex: 1;
-  min-height: 0;
+  min-width: 0;
 }
 
 .yt-video-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(2, 1fr);
-  gap: 0.375rem;
+  gap: 0.25rem;
   height: 100%;
 }
 
@@ -880,12 +885,22 @@ body {
   align-items: center;
   justify-content: center;
   color: #9ca3af;
-  font-size: 0.625rem;
+  font-size: 0.5rem;
 }
 
 .yt-video-grid .yt-thumb-card {
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
   overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .yt-grid-new { padding: 0.75rem; gap: 0.75rem; }
+  .yt-logo { width: 2.25rem; height: 2.25rem; }
+  .yt-logo svg { width: 1rem; height: 1rem; }
+  .yt-channel-name { font-size: 0.75rem; }
+  .yt-subscribe-btn { font-size: 0.625rem; padding: 0.25rem 0.625rem; }
+  .yt-video-grid { gap: 0.375rem; }
+  .yt-video-grid .yt-thumb-card { border-radius: 0.5rem; }
 }
 
 /* Footer */
@@ -1304,16 +1319,16 @@ const generateHtml = (data: SiteData, imageMap: Record<string, string>): string 
              const subCountHtml = subscriberCount ? `<span class="yt-sub-count">${subscriberCount}</span>` : '';
              contentHtml = `
              <div class="youtube-fetcher yt-grid-new" ${fetcherAttrs}>
-                <div class="yt-header-row">
+                <div class="yt-left">
                     <div class="yt-logo">
                         <svg viewBox="0 0 24 24" fill="white"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0C.488 3.45.029 5.804 0 12c.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0C23.512 20.55 23.971 18.196 24 12c-.029-6.185-.484-8.549-4.385-8.816zM9 16V8l8 3.993L9 16z"/></svg>
                     </div>
+                    <h3 class="yt-channel-name" data-role="channel-title">${escapeHtml(block.channelTitle) || 'YouTube'}</h3>
                     <a href="${escapeAttr(subscribeUrl)}" target="_blank" rel="noopener noreferrer" class="yt-subscribe-btn">
                         <span>Subscribe</span>
                         ${subCountHtml}
                     </a>
                 </div>
-                <h3 class="yt-channel-name" data-role="channel-title">${escapeHtml(block.channelTitle) || 'YouTube'}</h3>
                 <div class="yt-right">
                     <div data-role="video-container" data-max-videos="4" class="yt-video-grid">
                         <div class="yt-loading">Loading...</div>
