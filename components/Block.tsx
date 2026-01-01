@@ -560,7 +560,7 @@ const Block: React.FC<BlockProps> = ({
   // ===== YOUTUBE GRID/LIST LAYOUT =====
   if (isYoutubeGrid || isYoutubeList) {
     const displayVideos = activeVideos.slice(0, 4);
-    const subscriberCount = block.subscriberCount || '139K'; // Default for demo
+    const subscriberCount = block.subscriberCount; // Only show if defined
 
     return (
       <motion.div
@@ -646,7 +646,7 @@ const Block: React.FC<BlockProps> = ({
               className="inline-flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-full shadow hover:shadow-md transition-all px-2.5 py-1 md:px-3 md:py-1.5 text-[10px] md:text-xs"
             >
               <span>Subscribe</span>
-              <span className="opacity-90">{subscriberCount}</span>
+              {subscriberCount && <span className="opacity-90">{subscriberCount}</span>}
             </a>
           </div>
 

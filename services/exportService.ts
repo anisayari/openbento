@@ -796,106 +796,64 @@ body {
   font-weight: 500;
 }
 
-/* YouTube Grid New Design */
+/* YouTube Grid New Design - Vertical layout */
 .yt-grid-new {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 1rem;
-  gap: 0.75rem;
+  padding: 0.625rem;
+  gap: 0.375rem;
 }
 
-.yt-grid-new.yt-large {
-  flex-direction: row;
-  padding: 1.25rem;
-  gap: 1.5rem;
-}
-
-.yt-left {
+.yt-header-row {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-}
-
-.yt-large .yt-left {
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  width: 33%;
+  justify-content: space-between;
   gap: 0.5rem;
 }
 
 .yt-logo {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
   background: #ef4444;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
   flex-shrink: 0;
 }
 
 .yt-logo svg {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.yt-large .yt-logo {
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 1rem;
-  margin-bottom: 0.5rem;
-}
-
-.yt-large .yt-logo svg {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 1rem;
+  height: 1rem;
 }
 
 .yt-channel-name {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: #111827;
-  flex: 1;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.yt-large .yt-channel-name {
-  font-size: 1.25rem;
-  margin-bottom: 0.75rem;
-  white-space: normal;
+  margin-bottom: 0.375rem;
 }
 
 .yt-subscribe-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
   background: #ef4444;
   color: white;
   font-weight: 600;
-  font-size: 0.75rem;
-  padding: 0.5rem 1rem;
+  font-size: 0.625rem;
+  padding: 0.25rem 0.625rem;
   border-radius: 9999px;
   text-decoration: none;
-  box-shadow: 0 4px 8px rgba(239, 68, 68, 0.25);
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.25);
   transition: all 0.2s ease;
   flex-shrink: 0;
 }
 
 .yt-subscribe-btn:hover {
   background: #dc2626;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(239, 68, 68, 0.35);
-}
-
-.yt-large .yt-subscribe-btn {
-  font-size: 0.875rem;
-  padding: 0.625rem 1.25rem;
 }
 
 .yt-sub-count {
@@ -911,7 +869,7 @@ body {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(2, 1fr);
-  gap: 0.5rem;
+  gap: 0.375rem;
   height: 100%;
 }
 
@@ -922,12 +880,12 @@ body {
   align-items: center;
   justify-content: center;
   color: #9ca3af;
-  font-size: 0.75rem;
+  font-size: 0.625rem;
 }
 
 .yt-video-grid .yt-thumb-card {
-  aspect-ratio: 16/9;
-  height: auto;
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
 
 /* Footer */
@@ -1341,21 +1299,21 @@ const generateHtml = (data: SiteData, imageMap: Record<string, string>): string 
         const fetcherAttrs = `data-channel-id="${escapeAttr(safeChannelId)}" data-mode="${escapeAttr(mode)}" data-size="${escapeAttr(sizeClass)}"`;
 
         if (isMulti) {
-             const isLargeBlock = block.colSpan >= 3 && block.rowSpan >= 2;
-             const subscriberCount = escapeHtml(block.subscriberCount) || '139K';
+             const subscriberCount = block.subscriberCount ? escapeHtml(block.subscriberCount) : '';
              const subscribeUrl = safeChannelId ? `https://youtube.com/channel/${safeChannelId}?sub_confirmation=1` : '#';
+             const subCountHtml = subscriberCount ? `<span class="yt-sub-count">${subscriberCount}</span>` : '';
              contentHtml = `
-             <div class="youtube-fetcher yt-grid-new ${isLargeBlock ? 'yt-large' : ''}" ${fetcherAttrs}>
-                <div class="yt-left">
+             <div class="youtube-fetcher yt-grid-new" ${fetcherAttrs}>
+                <div class="yt-header-row">
                     <div class="yt-logo">
                         <svg viewBox="0 0 24 24" fill="white"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0C.488 3.45.029 5.804 0 12c.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0C23.512 20.55 23.971 18.196 24 12c-.029-6.185-.484-8.549-4.385-8.816zM9 16V8l8 3.993L9 16z"/></svg>
                     </div>
-                    <h3 class="yt-channel-name" data-role="channel-title">${escapeHtml(block.channelTitle) || 'YouTube'}</h3>
                     <a href="${escapeAttr(subscribeUrl)}" target="_blank" rel="noopener noreferrer" class="yt-subscribe-btn">
                         <span>Subscribe</span>
-                        <span class="yt-sub-count">${subscriberCount}</span>
+                        ${subCountHtml}
                     </a>
                 </div>
+                <h3 class="yt-channel-name" data-role="channel-title">${escapeHtml(block.channelTitle) || 'YouTube'}</h3>
                 <div class="yt-right">
                     <div data-role="video-container" data-max-videos="4" class="yt-video-grid">
                         <div class="yt-loading">Loading...</div>
