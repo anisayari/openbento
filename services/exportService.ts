@@ -796,20 +796,45 @@ body {
   font-weight: 500;
 }
 
-/* YouTube Grid New Design - Mobile: horizontal (text left, grid right) / Desktop: vertical (header top, grid bottom) */
+/* YouTube Grid New Design - Responsive based on aspect ratio */
 .yt-grid-new {
   display: flex;
-  flex-direction: row;
   height: 100%;
   padding: 0.5rem;
   gap: 0.5rem;
 }
 
-.yt-header {
-  width: 30%;
-  display: flex;
+/* Default: landscape (wider than tall) - horizontal layout */
+.yt-grid-new {
+  flex-direction: row;
+}
+.yt-grid-new .yt-header {
+  width: 28%;
   flex-direction: column;
   justify-content: center;
+}
+.yt-grid-new .yt-subscribe-btn {
+  align-self: flex-start;
+}
+
+/* Portrait (taller than wide) - vertical layout */
+.yt-grid-new.yt-portrait {
+  flex-direction: column;
+}
+.yt-grid-new.yt-portrait .yt-header {
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+}
+.yt-grid-new.yt-portrait .yt-channel-name {
+  flex: 1;
+}
+.yt-grid-new.yt-portrait .yt-subscribe-btn {
+  align-self: center;
+}
+
+.yt-header {
+  display: flex;
   gap: 0.375rem;
   flex-shrink: 0;
 }
@@ -855,7 +880,6 @@ body {
   text-decoration: none;
   box-shadow: 0 2px 4px rgba(239, 68, 68, 0.25);
   transition: all 0.2s ease;
-  align-self: flex-start;
 }
 
 .yt-subscribe-btn:hover {
@@ -896,25 +920,12 @@ body {
 }
 
 @media (min-width: 768px) {
-  .yt-grid-new {
-    flex-direction: column;
-    padding: 0.75rem;
-    gap: 0.5rem;
-  }
-  .yt-header {
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.75rem;
-  }
+  .yt-grid-new { padding: 0.75rem; gap: 0.5rem; }
+  .yt-header { gap: 0.5rem; }
   .yt-logo { width: 2rem; height: 2rem; }
   .yt-logo svg { width: 1rem; height: 1rem; }
-  .yt-channel-name { font-size: 0.75rem; flex: 1; }
-  .yt-subscribe-btn {
-    font-size: 0.625rem;
-    padding: 0.25rem 0.625rem;
-    align-self: center;
-  }
+  .yt-channel-name { font-size: 0.75rem; }
+  .yt-subscribe-btn { font-size: 0.625rem; padding: 0.25rem 0.625rem; }
   .yt-video-grid { gap: 0.375rem; }
   .yt-video-grid .yt-thumb-card { border-radius: 0.5rem; }
 }
@@ -1154,6 +1165,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (document.visibilityState === 'hidden') trackSessionEnd();
     });
     window.addEventListener('pagehide', trackSessionEnd);
+
+    // YouTube Grid Responsive Layout (aspect ratio based)
+    const ytGrids = document.querySelectorAll('.yt-grid-new');
+    const ytResizeObserver = new ResizeObserver(entries => {
+        entries.forEach(entry => {
+            const { width, height } = entry.contentRect;
+            if (height > width) {
+                entry.target.classList.add('yt-portrait');
+            } else {
+                entry.target.classList.remove('yt-portrait');
+            }
+        });
+    });
+    ytGrids.forEach(grid => ytResizeObserver.observe(grid));
 
     // YouTube Fetcher
     const fetchers = document.querySelectorAll('.youtube-fetcher');
