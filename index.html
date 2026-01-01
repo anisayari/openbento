@@ -17,6 +17,13 @@
           -ms-overflow-style: none;
           scrollbar-width: none;
       }
+
+      /* Mobile: all blocks take full width */
+      @media (max-width: 767px) {
+        [data-block-id] {
+          grid-column: 1 / -1 !important;
+        }
+      }
     </style>
   <script type="importmap">
 {

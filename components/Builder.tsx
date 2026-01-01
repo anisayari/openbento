@@ -1590,9 +1590,8 @@ const Builder: React.FC<BuilderProps> = ({ onBack }) => {
                                     <motion.main
                                         ref={gridRef as any}
                                         layout
-                                        className="grid gap-2"
+                                        className="grid gap-2 grid-cols-1 md:grid-cols-9"
                                         style={{
-                                            gridTemplateColumns: 'repeat(9, 1fr)',
                                             gridAutoRows: '64px', // Auto rows for scrollable content
                                         }}
                                     >
